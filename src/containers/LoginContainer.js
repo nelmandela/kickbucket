@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import {browserHistory} from "react-router";
 import LoginView from "../components/Login";
 import instance from "../common/axiosInstance";
 
@@ -14,6 +15,7 @@ export default class LoginContainer extends Component{
             [event.target.name]: event.target.value
         })
     }
+
     handleSubmit = (event) => {
         event.preventDefault();
 
@@ -24,7 +26,10 @@ export default class LoginContainer extends Component{
                 ...this.state
             }
         }).then((response) => {
-            console.log(response.data)
+            if(response.data.status === "success"){
+                localStorage.setItem("kickbucket_token", response.data.Authorization)
+                browserHistory.push("/dashboard")
+            }
         }).catch((error) => {        
             this.setState({
                 errorMessage: error.response.data.message
@@ -32,6 +37,7 @@ export default class LoginContainer extends Component{
             
         })
     }
+    
     render(){
 
         return (
