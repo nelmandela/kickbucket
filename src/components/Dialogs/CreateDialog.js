@@ -10,7 +10,7 @@ const CreateDialog = (props) => {
         <FlatButton
             label="Add"
             primary={true}
-            onClick={props.handleClose}
+            onClick={props.handleSubmit}
         />,
         <FlatButton
             label="Cancel"
@@ -30,14 +30,19 @@ const CreateDialog = (props) => {
             >
                 <Col lg={12}>
                     <Col lg={10} lgOffset={2}>
+                        {props.errorMessage !== "" && 
+                            <p style={{'color': 'red'}}>{props.errorMessage}</p>}
                         <TextField
                             name="name"
-                            floatingLabelText="Enter bucketlist name" />
+                            floatingLabelText="Enter bucketlist name"
+                            onChange={props.handleChange} />
                     </Col>
                     <Col lg={10} lgOffset={2}>
                         <TextField
                             name="description"
-                            floatingLabelText="Enter bucketlist description" />
+                            floatingLabelText="Enter bucketlist description"
+                            onChange={props.handleChange} />
+                            
                     </Col>
                 </Col>
             </Dialog>

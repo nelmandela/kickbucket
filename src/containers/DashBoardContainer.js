@@ -22,6 +22,42 @@ export default class DashBoardContainer extends Component {
         })
     }
 
+    handleSubmit = (event) => {
+        event.preventDefault();
+        const {name, description} = this.state;
+
+        if(name === "" || description === ""){
+            this.setState({
+                errorMessage: "inputs cannot be empty"
+            })
+        }
+        else {
+            instance.request({
+                url: "/bucketlists",
+                method: "POST",
+                data: {
+                    name,
+                    description
+                }
+            }).then((response) => {
+                if(response.data.status === "success"){
+                    // get bucketlists again
+                    this.fetchBucketlists();
+
+                    // close the modal
+                    this.setState({
+                        createOpen: false,
+                        errorMessage: ""
+                    })
+                }
+            }).catch((error) => {        
+                this.setState({
+                    errorMessage: error.response.data.message
+                })
+            })
+        }
+    }
+
     handleOpen = (dialogType) => {
         // check type of dialog to be opened
         if (dialogType === "create-dialog") {
@@ -38,16 +74,25 @@ export default class DashBoardContainer extends Component {
         // check type of dialog to be closed
         if (dialogType === "create-dialog") {
             // close add new bucket dialog
-            this.setState({ createOpen: false });
+            this.setState({ 
+                createOpen: false,
+                errorMessage: ""
+            });
         }
         else {
             // close confirmation dialog
-            this.setState({ confirmOpen: false });
+            this.setState({ 
+                confirmOpen: false,
+                errorMessage: ""
+            });
         }
     }
 
     componentWillMount() {
+        this.fetchBucketlists();
+    }
 
+    fetchBucketlists = () => {
         instance.request({
             url: "/bucketlists",
             method: "GET",
@@ -78,13 +123,24 @@ export default class DashBoardContainer extends Component {
                 </Col>
                 <Col lg={12}>
                     {this.state.bucketlists.length > 0 && this.state.bucketlists.map((bucket, index) => (
-                        <BucketListCard key={index} {...bucket} />
+                        <BucketListCard 
+                            key={index} 
+                            {...bucket} />
                     ))}
                 </Col>
                 {/* dashboard dialogs container */}
                 <div>
-                    <CreateDialog handleClose={this.handleClose} open={this.state.createOpen} />
-                    <ConfirmDialog handleClose={this.handleClose} open={this.state.confirmOpen} />
+                    <CreateDialog 
+                        handleChange={this.handleChange} 
+                        handleClose={this.handleClose} 
+                        errorMessage={this.state.errorMessage}
+                        handleSubmit={this.handleSubmit}
+                        open={this.state.createOpen} />
+
+                    <ConfirmDialog 
+                        handleChange={this.handleChange} 
+                        handleClose={this.handleClose} 
+                        open={this.state.confirmOpen} />
                 </div>
             </Grid>
         )

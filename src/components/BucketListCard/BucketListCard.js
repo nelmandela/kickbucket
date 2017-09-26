@@ -7,7 +7,7 @@ import FlatButton from 'material-ui/FlatButton';
 export const BucketListCard = (bucket) => {
     const created_on = `created on: ${moment(bucket.created_on).format("YYYY-MM-DD")}`;
     return (
-        <Col lg={6} xs={12} sm={6}>
+        <Col lg={5} xs={12} sm={6} style={{'margin': '1%'}}>
             <Card>
                 <CardHeader
                     title={bucket.name}
