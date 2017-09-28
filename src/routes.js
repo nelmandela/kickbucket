@@ -4,6 +4,7 @@ import App from "./components/App";
 import LoginContainer from "./containers/LoginContainer";
 import SignUpContainer from "./containers/SignUpContainer";
 import DashBoardContainer from "./containers/DashBoardContainer";
+import ItemContainer from './containers/ItemContainer';
 
 const redirectIfAuthenticated = (nextProps, replace) => {
     const token = localStorage.getItem("kickbucket_token");
@@ -33,6 +34,8 @@ const Routes = (
         // protected routes
         <Route path="/dashboard" onEnter={redirectIfNotAuthenticated} component={DashBoardContainer} />
         <Route path="/bucketlists/:bucket_id" onEnter={redirectIfNotAuthenticated} component={DashBoardContainer} />
+        <Route path="/bucketlists/:bucket_id/items" onEnter={redirectIfNotAuthenticated} component={ItemContainer} />
+
 
     </Route>
 )
