@@ -5,7 +5,7 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 
 import { BucketListCard } from "../components/BucketListCard";
 import { CreateDialog, ConfirmDialog } from "../components/Dialogs";
-
+import { browserHistory } from 'react-router';
 import instance from "../utils/axiosInstance";
 
 export default class DashBoardContainer extends Component {
@@ -151,7 +151,6 @@ export default class DashBoardContainer extends Component {
 
         }
         else {
-          console.log(bucket_id)
             // open confirmation dialog
             this.setState({
               confirmOpen: true,
@@ -180,6 +179,14 @@ export default class DashBoardContainer extends Component {
         }
     }
 
+    redirectTo = (bucket_id, bucket_title) =>{
+        // event.preventDefault();
+        browserHistory.push({
+                           pathname: "/bucketlists/" + bucket_id +"/items/",
+                           state: { title: bucket_title }
+                       });
+      }
+    
     componentWillMount() {
         this.fetchBucketlists();
     }
@@ -204,7 +211,7 @@ export default class DashBoardContainer extends Component {
             'float': 'right',
             'marginBottom': '20px'
         }
-
+        
         return (
             <Grid>
                 <h3 className="text-lead lead text-center">Welcome to your dashboard</h3>
@@ -217,8 +224,10 @@ export default class DashBoardContainer extends Component {
                     {this.state.bucketlists.length > 0 && this.state.bucketlists.map((bucket, index) => (
                         <BucketListCard
                             handleOpen={this.handleOpen}
+                            redirect={this.redirectTo}
                             key={index}
-                            {...bucket} />
+                            {...bucket} 
+                            />
                     ))}
                 </Col>
                 {/* dashboard dialogs container */}
