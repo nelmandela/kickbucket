@@ -100,38 +100,27 @@ export default class DashBoardContainer extends Component {
 
     handleDelete = (event) => {
         event.preventDefault();
-        const {name, description} = this.state;
 
-        if(name === "" || description === ""){
-            this.setState({
-                errorMessage: "inputs cannot be empty"
-            })
-        }
-        else {
-            instance.request({
-                url: "/bucketlists",
-                method: "DELETE",
-                data: {
-                    name,
-                    description
-                }
-            }).then((response) => {
-                if(response.data.status === "success"){
-                    // get bucketlists again
-                    this.fetchBucketlists();
+        instance.request({
+            url: `/bucketlists/${this.state.bucket_id}`,
+            method: "DELETE",
+        }).then((response) => {
+            if(response.data.status === "success"){
+                // get bucketlists again
+                this.fetchBucketlists();
 
-                    // close the modal
-                    this.setState({
-                        createOpen: false,
-                        errorMessage: ""
-                    })
-                }
-            }).catch((error) => {
+                // close the modal
                 this.setState({
-                    errorMessage: error.response.data.message
+                    confirmOpen: false,
+                    errorMessage: "",
+                    bucket_id: ""
                 })
+            }
+        }).catch((error) => {
+            this.setState({
+                errorMessage: error.response.data.message
             })
-        }
+        })
     }
 
     handleOpen = (dialogType, bucket_id) => {
@@ -146,7 +135,7 @@ export default class DashBoardContainer extends Component {
               editing: false
             });
         }
-        else if (bucket_id !== undefined) {
+        else if (dialogType === "create-dialog" && bucket_id !== undefined) {
           const bucket = this.state.bucketlists.filter((bucket) => bucket.bucketlistId === parseInt(bucket_id))[0];
           if (bucket) {
             // open dialog as edit
@@ -162,8 +151,12 @@ export default class DashBoardContainer extends Component {
 
         }
         else {
+          console.log(bucket_id)
             // open confirmation dialog
-            this.setState({ confirmOpen: true });
+            this.setState({
+              confirmOpen: true,
+              bucket_id: bucket_id
+            });
         }
     }
 
@@ -181,7 +174,8 @@ export default class DashBoardContainer extends Component {
             // close confirmation dialog
             this.setState({
                 confirmOpen: false,
-                errorMessage: ""
+                errorMessage: "",
+                bucket_id: ""
             });
         }
     }
@@ -240,6 +234,8 @@ export default class DashBoardContainer extends Component {
                     <ConfirmDialog
                         handleChange={this.handleChange}
                         handleClose={this.handleClose}
+                        handleDelete={this.handleDelete}
+                        actionMessage="Are you sure you want to delete the bucketlist?"
                         open={this.state.confirmOpen} />
                 </div>
             </Grid>

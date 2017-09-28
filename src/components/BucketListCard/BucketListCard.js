@@ -15,7 +15,7 @@ export const BucketListCard = (bucket) => {
                 />
                 <CardActions>
                     <FlatButton onClick={() => bucket.handleOpen("create-dialog", bucket.bucketlistId)} label="Edit" />
-                    <FlatButton label="Delete" />
+                    <FlatButton onClick={() => bucket.handleOpen("", bucket.bucketlistId)} label="Delete" />
                     <Link to={`/${bucket.bucketlistId}/items`}><FlatButton label="View Items" /></Link>
                 </CardActions>
                 <CardText expandable={true}>

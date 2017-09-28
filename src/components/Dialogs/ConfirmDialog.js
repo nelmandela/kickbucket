@@ -11,9 +11,9 @@ const ConfirmDialog = (props) => {
             onClick={() => props.handleClose("confirm-dialog")}
         />,
         <FlatButton
-            label="Discard"
+            label="Delete"
             primary={true}
-            onClick={props.handleClose}
+            onClick={props.handleDelete}
         />,
     ];
 
@@ -25,7 +25,7 @@ const ConfirmDialog = (props) => {
                 open={props.open}
                 onRequestClose={() => props.handleClose("confirm-dialog")}
             >
-                Discard draft?
+                {props.actionMessage}
         </Dialog>
         </div>
     )
