@@ -13,9 +13,10 @@ export default class DashBoardContainer extends Component {
         bucketlists: [],
         name: "",
         description: "",
+        title: "Add a new bucket list",
+        editing: false,
         confirmOpen: false,
         createOpen: false,
-        title: "Add a new bucket list",
         errorMessage: ""
     }
 
@@ -72,7 +73,7 @@ export default class DashBoardContainer extends Component {
         }
         else {
             instance.request({
-                url: "/bucketlists",
+                url: `/bucketlists/${this.state.bucket_id}`,
                 method: "PUT",
                 data: {
                     name,
@@ -135,7 +136,7 @@ export default class DashBoardContainer extends Component {
 
     handleOpen = (dialogType, bucket_id) => {
         // check type of dialog to be opened
-        if (dialogType === "create-dialog" && bucket_id === "") {
+        if (dialogType === "create-dialog" && bucket_id === undefined) {
             // open add new bucket dialog
             this.setState({
               createOpen: true,
@@ -145,16 +146,17 @@ export default class DashBoardContainer extends Component {
               editing: false
             });
         }
-        else if (bucket_id !== "") {
-          const bucket = this.state.bucketlists.filter((bucket) => bucket.id === bucket_id);
+        else if (bucket_id !== undefined) {
+          const bucket = this.state.bucketlists.filter((bucket) => bucket.bucketlistId === parseInt(bucket_id))[0];
           if (bucket) {
             // open dialog as edit
             this.setState({
                 createOpen: true,
                 bucket_id: bucket_id,
                 name: bucket.name,
-                description: bucket.description,
-                editing: true
+                description: bucket.description || "",
+                editing: true,
+                title: `Edit bucketlist ${bucket.name}`
              });
           }
 
@@ -171,7 +173,8 @@ export default class DashBoardContainer extends Component {
             // close add new bucket dialog
             this.setState({
                 createOpen: false,
-                errorMessage: ""
+                errorMessage: "",
+                title: "Add a new bucketlist"
             });
         }
         else {
@@ -210,7 +213,7 @@ export default class DashBoardContainer extends Component {
 
         return (
             <Grid>
-                <p>Welcome to your dashboard</p>
+                <h3 className="text-lead lead text-center">Welcome to your dashboard</h3>
                 <Col lg={12} className="floating-btn">
                     <FloatingActionButton style={style} onClick={() => this.handleOpen("create-dialog")}>
                         <ContentAdd />
@@ -230,6 +233,7 @@ export default class DashBoardContainer extends Component {
                         handleChange={this.handleChange}
                         handleClose={this.handleClose}
                         handleSubmit={this.handleSubmit}
+                        handleEdit={this.handleEdit}
                         {...this.state}
                     />
 

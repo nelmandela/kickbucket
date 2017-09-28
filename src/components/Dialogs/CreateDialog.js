@@ -8,9 +8,9 @@ import TextField from "material-ui/TextField";
 const CreateDialog = (props) => {
     const actions = [
         <FlatButton
-            label="Add"
+            label={props.editing ? "Edit" : "Add"}
             primary={true}
-            onClick={props.handleSubmit}
+            onClick={props.editing ? props.handleEdit :props.handleSubmit}
         />,
         <FlatButton
             label="Cancel"
