@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import SignUpView from "../components/SignUp";
-import instance from "../common/axiosInstance";
+import instance from "../utils/axiosInstance";
 
 export default class SignUpContainer extends Component{
     state = {
@@ -25,21 +25,21 @@ export default class SignUpContainer extends Component{
             }
         }).then((response) => {
             console.log(response.data)
-        }).catch((error) => {        
+        }).catch((error) => {
             this.setState({
                 errorMessage: error.response.data.message
             })
-            
+
         })
     }
     render(){
         return (
             <div>
-                <p>Signup Container</p>    
-                <SignUpView 
+                <p>Signup Container</p>
+                <SignUpView
                     handleChange={this.handleChange}
                     handleSubmit={this.handleSubmit}
-                    {...this.state} />        
+                    {...this.state} />
             </div>
         )
     }

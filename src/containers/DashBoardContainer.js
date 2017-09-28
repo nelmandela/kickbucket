@@ -6,13 +6,16 @@ import ContentAdd from 'material-ui/svg-icons/content/add';
 import { BucketListCard } from "../components/BucketListCard";
 import { CreateDialog, ConfirmDialog } from "../components/Dialogs";
 
-import instance from "../common/axiosInstance";
+import instance from "../utils/axiosInstance";
 
 export default class DashBoardContainer extends Component {
     state = {
         bucketlists: [],
+        name: "",
+        description: "",
         confirmOpen: false,
         createOpen: false,
+        title: "Add a new bucket list",
         errorMessage: ""
     }
 
@@ -50,7 +53,7 @@ export default class DashBoardContainer extends Component {
                         errorMessage: ""
                     })
                 }
-            }).catch((error) => {        
+            }).catch((error) => {
                 this.setState({
                     errorMessage: error.response.data.message
                 })
@@ -58,11 +61,103 @@ export default class DashBoardContainer extends Component {
         }
     }
 
-    handleOpen = (dialogType) => {
+    handleEdit = (event) => {
+        event.preventDefault();
+        const {name, description} = this.state;
+
+        if(name === "" || description === ""){
+            this.setState({
+                errorMessage: "inputs cannot be empty"
+            })
+        }
+        else {
+            instance.request({
+                url: "/bucketlists",
+                method: "PUT",
+                data: {
+                    name,
+                    description
+                }
+            }).then((response) => {
+                if(response.data.status === "success"){
+                    // get bucketlists again
+                    this.fetchBucketlists();
+
+                    // close the modal
+                    this.setState({
+                        createOpen: false,
+                        errorMessage: ""
+                    })
+                }
+            }).catch((error) => {
+                this.setState({
+                    errorMessage: error.response.data.message
+                })
+            })
+        }
+    }
+
+    handleDelete = (event) => {
+        event.preventDefault();
+        const {name, description} = this.state;
+
+        if(name === "" || description === ""){
+            this.setState({
+                errorMessage: "inputs cannot be empty"
+            })
+        }
+        else {
+            instance.request({
+                url: "/bucketlists",
+                method: "DELETE",
+                data: {
+                    name,
+                    description
+                }
+            }).then((response) => {
+                if(response.data.status === "success"){
+                    // get bucketlists again
+                    this.fetchBucketlists();
+
+                    // close the modal
+                    this.setState({
+                        createOpen: false,
+                        errorMessage: ""
+                    })
+                }
+            }).catch((error) => {
+                this.setState({
+                    errorMessage: error.response.data.message
+                })
+            })
+        }
+    }
+
+    handleOpen = (dialogType, bucket_id) => {
         // check type of dialog to be opened
-        if (dialogType === "create-dialog") {
+        if (dialogType === "create-dialog" && bucket_id === "") {
             // open add new bucket dialog
-            this.setState({ createOpen: true });
+            this.setState({
+              createOpen: true,
+              bucket_id: "",
+              name: "",
+              description: "",
+              editing: false
+            });
+        }
+        else if (bucket_id !== "") {
+          const bucket = this.state.bucketlists.filter((bucket) => bucket.id === bucket_id);
+          if (bucket) {
+            // open dialog as edit
+            this.setState({
+                createOpen: true,
+                bucket_id: bucket_id,
+                name: bucket.name,
+                description: bucket.description,
+                editing: true
+             });
+          }
+
         }
         else {
             // open confirmation dialog
@@ -74,14 +169,14 @@ export default class DashBoardContainer extends Component {
         // check type of dialog to be closed
         if (dialogType === "create-dialog") {
             // close add new bucket dialog
-            this.setState({ 
+            this.setState({
                 createOpen: false,
                 errorMessage: ""
             });
         }
         else {
             // close confirmation dialog
-            this.setState({ 
+            this.setState({
                 confirmOpen: false,
                 errorMessage: ""
             });
@@ -110,7 +205,7 @@ export default class DashBoardContainer extends Component {
     render() {
         const style= {
             'float': 'right',
-            'marginBottom': '20px' 
+            'marginBottom': '20px'
         }
 
         return (
@@ -123,23 +218,24 @@ export default class DashBoardContainer extends Component {
                 </Col>
                 <Col lg={12}>
                     {this.state.bucketlists.length > 0 && this.state.bucketlists.map((bucket, index) => (
-                        <BucketListCard 
-                            key={index} 
+                        <BucketListCard
+                            handleOpen={this.handleOpen}
+                            key={index}
                             {...bucket} />
                     ))}
                 </Col>
                 {/* dashboard dialogs container */}
                 <div>
-                    <CreateDialog 
-                        handleChange={this.handleChange} 
-                        handleClose={this.handleClose} 
-                        errorMessage={this.state.errorMessage}
+                    <CreateDialog
+                        handleChange={this.handleChange}
+                        handleClose={this.handleClose}
                         handleSubmit={this.handleSubmit}
-                        open={this.state.createOpen} />
+                        {...this.state}
+                    />
 
-                    <ConfirmDialog 
-                        handleChange={this.handleChange} 
-                        handleClose={this.handleClose} 
+                    <ConfirmDialog
+                        handleChange={this.handleChange}
+                        handleClose={this.handleClose}
                         open={this.state.confirmOpen} />
                 </div>
             </Grid>

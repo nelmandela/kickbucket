@@ -14,7 +14,7 @@ export const BucketListCard = (bucket) => {
                     subtitle={created_on}
                 />
                 <CardActions>
-                    <FlatButton label="Edit" />
+                    <FlatButton onClick={() => bucket.handleOpen("create-dialog", bucket.id)} label="Edit" />
                     <FlatButton label="Delete" />
                     <FlatButton label="View Items" />
                 </CardActions>
@@ -22,8 +22,6 @@ export const BucketListCard = (bucket) => {
                     <p>{bucket.description}</p>
                 </CardText>
             </Card>
-        </Col>   
+        </Col>
     )
 };
-
-
