@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Grid, Col } from "react-bootstrap";
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
+import Pagination from 'material-ui-pagination';
 
 import { BucketListCard } from "../components/BucketListCard";
 import { CreateDialog, ConfirmDialog } from "../components/Dialogs";
@@ -17,7 +18,39 @@ export default class DashBoardContainer extends Component {
         editing: false,
         confirmOpen: false,
         createOpen: false,
-        errorMessage: ""
+        errorMessage: "",
+    }
+
+    setTotal = (event, total) => {
+      // eslint-disable-next-line no-param-reassign
+      total = total.trim();
+      if (total.match(/^\d*$/)) {
+        if (total !== '') {
+          // eslint-disable-next-line no-param-reassign
+          total = parseInt(total, 10);
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          total = 0;
+        }
+
+        this.setState({ total });
+      }
+    }
+
+    setDisplay = (event, display) => {
+      // eslint-disable-next-line no-param-reassign
+      display = display.trim();
+      if (display.match(/^\d*$/)) {
+        if (display !== '') {
+          // eslint-disable-next-line no-param-reassign
+          display = parseInt(display, 10);
+        } else {
+          // eslint-disable-next-line no-param-reassign
+          display = 0;
+        }
+
+        this.setState({ display });
+      }
     }
 
     handleChange = (event) => {
@@ -186,24 +219,28 @@ export default class DashBoardContainer extends Component {
                            state: { title: bucket_title }
                        });
       }
-    
+
     componentWillMount() {
         this.fetchBucketlists();
     }
 
-    fetchBucketlists = () => {
+    fetchBucketlists = (nextPage = 1) => {
         instance.request({
-            url: "/bucketlists",
+            url: `/bucketlists?page=${nextPage}`,
             method: "GET",
         }).then((response) => {
             this.setState({
-                bucketlists: response.data.bucketlist
+                bucketlists: response.data.bucketlist,
+                total: response.data.meta.total_pages,
+                display: response.data.meta.total_pages,
+                number: nextPage
             })
         }).catch((error) => {
             this.setState({
                 errorMessage: error.response.data.message
             })
-        })
+        });
+
     }
 
     render() {
@@ -211,7 +248,7 @@ export default class DashBoardContainer extends Component {
             'float': 'right',
             'marginBottom': '20px'
         }
-        
+
         return (
             <Grid>
                 <h3 className="text-lead lead text-center">Welcome to your dashboard</h3>
@@ -226,9 +263,17 @@ export default class DashBoardContainer extends Component {
                             handleOpen={this.handleOpen}
                             redirect={this.redirectTo}
                             key={index}
-                            {...bucket} 
+                            {...bucket}
                             />
                     ))}
+                </Col>
+                <Col>
+                  <Pagination
+                    total = { this.state.total }
+                    current = { this.state.number }
+                    display = { this.state.display }
+                    onChange = { number => this.fetchBucketlists(number) }
+                  />
                 </Col>
                 {/* dashboard dialogs container */}
                 <div>
